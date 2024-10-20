@@ -1,21 +1,25 @@
 import express from 'express'
 import 'dotenv/config'
 import {conectDb} from './db/connectDb.js'
-import User from './models/user.model.js'
-
+// import User from './models/user.model.js'
+import userRouter from "./routes/user.route.js"
 const app = express()
 
-const users = async ()=>{
-   const ss=  await User.create({
-     username:'muayad',
-     email:"muayad@gmai.com",
-     password:"hi"
-    })
 
-    console.log(ss);
+app.use('/api/user',userRouter)
+
+
+// const users = async ()=>{
+//    const ss=  await User.create({
+//      username:'muayad',
+//      email:"muayad@gmai.com",
+//      password:"hi"
+//     })
+
+//     console.log(ss);
     
-}
-users()
+// }
+// users()
 
 
 
