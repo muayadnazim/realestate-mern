@@ -10,18 +10,13 @@ app.use(express.json())
 app.use('/api/user',userRouter)
 app.use('/api/user',authRouter)
 
+app.use((error,req,res,next)=>{
+let stateCode = error.stateCode ||500;
+let message = error.message||'internal server error'
+ return res.status(stateCode).json(message)
 
-// const users = async ()=>{
-//    const ss=  await User.create({
-//      username:'muayad',
-//      email:"muayad@gmai.com",
-//      password:"hi"
-//     })
+})
 
-//     console.log(ss);
-    
-// }
-// users()
 
 
 
