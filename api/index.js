@@ -8,7 +8,7 @@ const app = express()
 
 app.use(express.json())
 app.use('/api/user',userRouter)
-app.use('/api/user',authRouter)
+app.use('/api/auth',authRouter)
 
 app.use((error,req,res,next)=>{
 let stateCode = error.stateCode ||500;
