@@ -21,12 +21,13 @@ try {
 }
 
 
-export const sginIn = async (req,res,next)=>{
+export const signIn = async (req,res,next)=>{
 const {email,password}= req.body
 
 try {
 const vaildUser = await User.findOne({email})
-const vaildPassword = bcryptjs.compare(password,vaildUser.password)
+if (!vaildUser) return next(errorHandeler(404, 'User not found!'));
+const vaildPassword = bcryptjs.compareSync(password,vaildUser.password)
     if(!vaildPassword){return next(errorHandeler(401,'wrong credentials'))}
 
     const token = jwt.sign({id:vaildUser._id},process.env.JWT_SECRET)

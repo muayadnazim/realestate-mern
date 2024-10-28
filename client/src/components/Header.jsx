@@ -20,7 +20,7 @@ export default function Header() {
         <div className="flex text-slate-500 justify-between gap-x-2.5">
             <Link className='hidden sm:inline  ' to='/'>Home</Link>
             <Link className='hidden sm:inline' to='/about'>About</Link>
-            <Link className='' to='/sign-up'>Sign In</Link>
+            <Link className='' to='/sign-in'>Sign In</Link>
         </div>
       </div>
     </header>
