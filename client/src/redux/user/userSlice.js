@@ -27,6 +27,21 @@ const initialState = {
         state.error=action.payload
         state.loading=false
        
+    },
+    upDateUserStart:(state)=>{
+        
+        state.loading=true
+
+    },
+    upDateUserSuccess:(state,action)=>{
+        state.currentUser=action.payload
+        state.loading=false
+        state.error=null
+    },
+    upDateUserFailure:(state,action)=>{
+        state.error=action.payload
+        state.loading=false
+       
     }
 
    }
@@ -34,6 +49,6 @@ const initialState = {
 
   })
 
-  export const {signInStart,signInSuccess,signInFailure}=userSlice.actions
+  export const {signInStart,signInSuccess,signInFailure,upDateUserStart,upDateUserSuccess,upDateUserFailure}=userSlice.actions
 
   export default userSlice.reducer

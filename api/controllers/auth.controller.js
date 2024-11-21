@@ -32,7 +32,7 @@ const vaildPassword = bcryptjs.compareSync(password,vaildUser.password)
 
     const token = jwt.sign({id:vaildUser._id},process.env.JWT_SECRET)
     const {password:pass,...rest}=vaildUser._doc;
-    res.cookie('access_token',token,{httpOnly:true,expires:new Date(Date.now()+30*24*60*60*1000)}).status(200).json({rest})
+    res.cookie('access_token',token,{httpOnly:true,expires:new Date(Date.now()+30*24*60*60*1000)}).status(200).json(rest)
 } catch (error) {
     next(error)
 }
