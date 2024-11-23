@@ -1,8 +1,21 @@
 import {useSelector} from 'react-redux'
 import { useRef ,useState,useEffect} from 'react'
 import { supabase } from '../../supabase.js'
-import {upDateUserStart,upDateUserSuccess,upDateUserFailure}from '../redux/user/userSlice.js'
+import {
+  upDateUserStart,
+  upDateUserSuccess,
+  upDateUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
+  signoutUserStart,
+  signoutUserSuccess,
+  signoutUserFailure
+
+}from '../redux/user/userSlice.js'
 import { useDispatch } from 'react-redux'
+import { errorHandeler } from '../../../api/utils/error.js'
+
 
 export default function Profile() {
 
@@ -67,6 +80,50 @@ export default function Profile() {
 
   }
 
+  const deleteUser = async () => {
+ try {
+  dispatch(deleteUserStart())
+  const res =  await fetch(`/api/user/delete/${currentUser._id}`,
+    {
+      method:'DELETE', 
+     
+    }
+  )
+
+  const data = await res.json()  
+
+      if (res.ok === false) {
+        dispatch(upDateUserFailure(data))
+        return;
+      }
+      dispatch(deleteUserSuccess(data))
+  
+  
+ } catch (error) {
+  dispatch(deleteUserFailure(error.message))
+ }
+  }
+
+  const signOutUser = async () => {
+     try {
+      dispatch(signoutUserStart())
+      const res = await fetch('/api/auth/signout',{
+        method:'GET'
+       })
+       const data = await res.json();
+       if (res.ok === false) {
+        dispatch(signoutUserFailure(data))
+        return;
+      }
+      dispatch(signoutUserSuccess(data))
+       
+      
+     } catch (error) {
+      errorHandeler(error.message)
+     }
+
+  }
+
   return (
     <div className='p-3 max-w-lg mx-auto'>
     <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
@@ -114,8 +171,8 @@ export default function Profile() {
         {loading?'Loading...':'Update'}</button>
     </form>
     <div className="flex justify-between mt-5">
-      <span className='text-red-700 cursor-pointer'>Delete account</span>
-      <span className='text-red-700 cursor-pointer'>Sign out</span>
+      <span onClick={deleteUser} className='text-red-700 cursor-pointer'>Delete account</span>
+      <span onClick={signOutUser} className='text-red-700 cursor-pointer'>Sign out</span>
     </div>
     <p className='text-red-700 mt-5'>{error?error:''}</p>
     <p className='text-green-700 mt-5'>{upDateSuccess?'Uesr Is Update Successfully!': ''}</p>

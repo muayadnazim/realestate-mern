@@ -11,14 +11,8 @@ export const user = (req,res)=>{
     
 }
 export const upDateUserInfo= async (req,res,next)=>{
-
-  
-    
- //if (req.user.id!==req.params.id) return next(errorHandeler(402,'you can only update own account'))
-   
+ if (req.user.id!==req.params.id) return next(errorHandeler(402,'you can only update own account'))
     try {
-
-      
     if(req.body.password){
         req.body.password=bcryptjs.hashSync(req.body.password,10)
     }
@@ -40,6 +34,20 @@ export const upDateUserInfo= async (req,res,next)=>{
     } catch (error) {
         next(error)
     }
+
+
+}
+
+export const deleteUser =async (req,res,next)=>{
+    if (req.user.id!==req.params.id) return next(errorHandeler(402,'you can only delet own account'))
+
+        try {
+            await User.findByIdAndDelete(req.params.id)
+            res.clearCookie('access_token')
+            res.status(200).json('user has been deleted!')
+        } catch (error) {
+            next(error)
+        }
 
 
 }
