@@ -41,6 +41,8 @@ export default function Listing() {
         setError(false);
         setLoading(false);
       } catch (error) {
+        console.log(error);
+
         setError(true);
         setLoading(false);
       }
@@ -58,11 +60,11 @@ export default function Listing() {
         <div>
           <Swiper navigation>
             {list.imageUrls.map((url) => (
-              <SwiperSlide key={url.data.publicUrl}>
+              <SwiperSlide key={url}>
                 <div
                   className="h-[550px]"
                   style={{
-                    background: `url(${url.data.publicUrl}) center no-repeat`,
+                    background: `url(${url}) center no-repeat`,
                     backgroundSize: "cover",
                   }}
                 ></div>
@@ -92,7 +94,7 @@ export default function Listing() {
             <p className="text-2xl font-semibold">
               {list.name} - ${" "}
               {list.offer
-                ? list.discountPrice.toLocaleString("en-US")
+                ? `${list.discountPrice.toLocaleString("en-US")} Discount`
                 : list.regularPrice.toLocaleString("en-US")}
               {list.type === "rent" && " / month"}
             </p>
@@ -102,7 +104,7 @@ export default function Listing() {
             </p>
             <div className="flex gap-4">
               <p className="bg-red-900 w-full max-w-[200px] text-white text-center p-1 rounded-md">
-                {list.type === "rent" ? "For Rent" : "For Sale"}
+                {list.type === "rent" ? "For Rent" : "For Sell"}
               </p>
               {list.offer && (
                 <p className="bg-green-900 w-full max-w-[200px] text-white text-center p-1 rounded-md">
@@ -137,7 +139,7 @@ export default function Listing() {
               </li>
             </ul>
 
-            {currentUser && currentUser._id === list.userRef && !contact && (
+            {currentUser && currentUser._id !== list.userRef && !contact && (
               <button
                 className="bg-slate-600 rounded-lg uppercase text-white p-3 hover:opacity-95"
                 onClick={() => setContat(true)}

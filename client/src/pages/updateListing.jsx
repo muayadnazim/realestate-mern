@@ -1,4 +1,4 @@
-import { supabase } from "../../supabase.js";
+import Parse from "../../back4app";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -71,18 +71,23 @@ export default function CreateListing() {
   const storeImage = (file) => {
     return new Promise((resolve, reject) => {
       const storeImage = async () => {
-        const { data, error } = await supabase.storage
-          .from("profileImage")
-          .upload(`${Date.now() + file.name}_image.png`, file);
-        if (error) {
+        try {
+          let name = `${Date.now() + file.name}`;
+          const File = new Parse.File(name, file);
+          await File.save();
+
+          const fileUrl = File.url();
+
+          const Listing = Parse.Object.extend("Listing");
+          const listing = new Listing();
+          listing.set("photo", File);
+          await listing.save();
+
+          resolve(fileUrl);
+        } catch (error) {
           reject(error);
-          console.error("Error uploading image:", error);
-          return null;
+          console.error("Error saving file:", error);
         }
-        const urls = supabase.storage
-          .from("profileImage")
-          .getPublicUrl(data?.path);
-        resolve(urls);
       };
       storeImage();
     });
@@ -362,12 +367,12 @@ rounded uppercase hover:shadow-lg disabled:opacity-80"
           {formData.imageUrls.length > 0 &&
             formData.imageUrls.map((url, index) => (
               <div
-                key={url.data.publicUrl}
+                key={url}
                 className="flex justify-between p-3 border items-center"
               >
                 <img
                   className="w-20 h-20 object-contain rounded-lg"
-                  src={url.data.publicUrl}
+                  src={url}
                   alt="listing image"
                 />
 

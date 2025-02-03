@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
-import { supabase } from "../../supabase.js";
+
 import {
   upDateUserStart,
   upDateUserSuccess,
@@ -15,7 +15,7 @@ import {
 } from "../redux/user/userSlice.js";
 import { useDispatch } from "react-redux";
 import { errorHandeler } from "../../../api/utils/error.js";
-
+import Parse from "../../back4app";
 export default function Profile() {
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const [file, setFile] = useState(null);
@@ -26,7 +26,6 @@ export default function Profile() {
   const [upDateSuccess, setUpDateSuccess] = useState(false);
   const [showListingError, setShowListingError] = useState(false);
   const [userListing, setUserListing] = useState(null);
-  console.log(userListing);
 
   useEffect(() => {
     if (file) {
@@ -35,20 +34,25 @@ export default function Profile() {
   }, [file]);
 
   const handleFileUpload = async (file) => {
-    const { data, error } = await supabase.storage
-      .from("profileImage")
-      .upload(`${Date.now()}_image.png`, file);
+    try {
+      let name = `${Date.now() + file.name}`;
+      const File = new Parse.File(name, file);
+      await File.save();
 
-    if (error) {
-      setFileUploadError(true);
-      console.error("Error uploading image:", error);
-      return null;
+      const fileUrl = File.url();
+
+      const Listing = Parse.Object.extend("ImageProfil");
+      const listing = new Listing();
+      listing.set("photo", File);
+      await listing.save();
+      setFormData({ ...formData, avatar: fileUrl });
+    } catch (error) {
+      if (error) {
+        setFileUploadError(true);
+        console.error("Error uploading image:", error);
+        return null;
+      }
     }
-
-    const url = await supabase.storage
-      .from("profileImage")
-      .getPublicUrl(data.path);
-    setFormData({ ...formData, avatar: url.data.publicUrl });
   };
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -170,20 +174,13 @@ export default function Profile() {
         />
 
         <p className="text-sm self-center">
-          {
-            fileUploadError ? (
-              <span className="text-red-700">
-                Error Image upload (image must be less than 2 mb)
-              </span>
-            ) : (
-              ""
-            )
-            // ) : filePerc > 0 && filePerc < 100 ? (
-            //   <span className='text-slate-700'>{`Uploading ${filePerc}%`}</span>
-            // ) : filePerc === 100 ? (
-            //   <span className='text-green-700'>Image successfully uploaded!</span>
-            // ) :
-          }
+          {fileUploadError ? (
+            <span className="text-red-700">
+              Error Image upload (image must be less than 2 mb)
+            </span>
+          ) : (
+            ""
+          )}
         </p>
 
         <input
@@ -258,7 +255,7 @@ export default function Profile() {
             >
               <Link to={`/listing/${listing._id}`}>
                 <img
-                  src={listing.imageUrls[0].data.publicUrl}
+                  src={listing.imageUrls[0]}
                   alt="listing cover"
                   className="h-16 w-16 object-contain"
                 />
